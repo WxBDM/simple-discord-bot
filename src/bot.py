@@ -63,14 +63,14 @@ async def on_command_error(ctx, error):
 # This is helpful so that you don't have to continually restart terminal
 # to restart the bot. Huge +1 for devs.
 @bot.command(aliases=["r"]) #can either do .r or .restart
-@checks.is_role_id(727957642844176474)
+@checks.has_role_id(727957642844176474)
 async def restart(ctx):    
     await ctx.message.add_reaction("\U00002705")
     os.system("clear")
     os.execv(sys.executable, ['python'] + sys.argv)
 
 @bot.command()
-@checks.is_role_id(727957642844176474)
+@checks.has_role_id(727957642844176474)
 async def whois(ctx, *, memberID : str = None):
     
     if memberID == None:

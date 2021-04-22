@@ -9,20 +9,23 @@ This file is used to check roles and channels in a given discord server.
 
 from discord.ext import commands
 
-def is_role_id(roleID):
+def has_role_id(roleID):
     '''Decorater used to determine if the user ID is valid for role checking.'''
     
-    def is_role_id_predicate(ctx):
+    def has_role_id_predicate(ctx):
         
         role_list = [x.id for x in ctx.message.author.roles] # get list of roles
         
         if roleID in role_list:
+            # If you would like to add in a message saying that they do not
+            #   have the proper role, place it here.
+            #   Example: await ctx.send("You do not have the proper role.")
+            #   Note that you must add async in front of "def is_role_predicate"
             return True # the user running the command has the role.
         
         return False # the user running the command is not of the role.
     
-    return commands.check(is_role_id_predicate)
-
+    return commands.check(has_role_id_predicate)
 
 def is_channel(expected_channel_id, this_channel_id):
     '''Decorater used to determine if the user ID is valid for role checking.'''
@@ -35,3 +38,5 @@ def is_channel(expected_channel_id, this_channel_id):
         return False # the user running the command is in the wrong channel.
     
     return commands.check(is_channel_predicate)
+
+
