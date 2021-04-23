@@ -16,22 +16,20 @@ import discord
 from discord.ext import commands
 import os
 import random
-import sys
 
 # package-related imports
-import decorator_checks as checks
 import admin
-import utils
+import errors
+
+# configuration
+admin_id = 727957642844176474
 
 bot = commands.Bot(command_prefix = '.') # create the bot
 bot.remove_command('help') # this will allow you to get the help menu.
 
-# Instatiate classes for admin and general usage
-admin_commands = admin.AdminCommands(bot)
-admin.setup(bot)
-
-# Role ID listing. The database uses
-
+# Register each component of the bot (aka, cogs)
+admin.setup(bot, admin_id) # Administrative stuff
+errors.setup(bot) # Error handling
 
 @bot.event # when the bot first starts up, send a message and let dev know it's working.
 async def on_ready():        
@@ -55,27 +53,6 @@ async def on_message(message):
     # You need this code here, otherwise the bot won't work!
     await bot.process_commands(message)
 
-# This is where we handle errors.
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        # If the command is not found, then tell the user it's not found.
-        await ctx.send("Command not found.")
-        
-    elif isinstance(error, commands.errors.CheckFailure):
-        pass
-    else:
-        # If you would like to log what happened, code can go here to do so.
-        raise error
-
-# This is helpful so that you don't have to continually restart terminal
-# to restart the bot. Huge +1 for devs.
-@bot.command(aliases=["r"]) #can either do .r or .restart
-@checks.has_role_id(727957642844176474)
-async def restart(ctx):    
-    await ctx.message.add_reaction("\U00002705")
-    os.system("clear")
-    os.execv(sys.executable, ['python'] + sys.argv)
 
 # do an 8ball response
 @bot.command(aliases=["8ball"])
@@ -89,7 +66,7 @@ async def _8ball(ctx, *, text : str = None):
              'Cannot predict now.', 'Concentrate and ask again.',
              "Don't count on it.", 'It is certain.', 'It is decidedly so.']
     
-    n = random.randint(0, len(choices))
+    n = random.randint(0, len(choices) - 1)
     
     await ctx.send(choices[n])
 

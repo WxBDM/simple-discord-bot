@@ -9,12 +9,19 @@ Class for administrative commands.
 
 import discord
 import utils
+import os
+import sys
 from discord.ext import commands
 
 class AdminCommands(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot, admin_id, *args, **kwargs):
         self.bot = bot
+        self.admin_id = admin_id
+        
+        # args and kwargs, in case they want them.
+        self.args = args
+        self.kwargs = kwargs
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -22,13 +29,29 @@ class AdminCommands(commands.Cog):
     
     async def cog_check(self, ctx):
         '''Checks to make sure you have the admin role.'''
+        
         role_list = [x.id for x in ctx.message.author.roles] # get list of roles
-        roleID = 727957642844176474
-        if roleID in role_list:
+        if self.admin_id in role_list:
             return True # the user running the command has the admin role.
         
+        # If the user doesn't have the role, let them know.
+        role_name = discord.utils.get(ctx.guild.roles, id = self.admin_id)
+        if role_name == None:
+            await ctx.send("You do not have the role needed to use this command.")
+            await ctx.send(f"Note: Unable to find role name. ID: {self.admin_id}")
+            return False
+        
+        await ctx.send(f"You must have the {role_name} role in order to run this command.")
         return False
     
+    @commands.command(aliases=["r"]) #can either do .r or .restart
+    async def restart(self,ctx):  
+        '''Restarts the bot (used for dev purposes only)'''
+        
+        await ctx.message.add_reaction("\U00002705")
+        os.system("clear")
+        os.execv(sys.executable, ['python'] + sys.argv)
+        
     @commands.command()
     async def whois(self, ctx, memberID):
         
@@ -73,5 +96,5 @@ class AdminCommands(commands.Cog):
         # Send the message!
         await ctx.send(embed = embed)   
 
-def setup(bot):
-    bot.add_cog(AdminCommands(bot))
+def setup(bot, admin_id, *args, **kwargs):
+    bot.add_cog(AdminCommands(bot, admin_id, *args, **kwargs))

@@ -31,26 +31,25 @@ class CommandErrorHandler(commands.Cog):
         """
         if hasattr(ctx.command, 'on_error'):
             return
+        
+        # ignored errors
+        ignored = (commands.NoPrivateMessage, discord.HTTPException,
+                   commands.CheckFailure)
+        error = getattr(error, 'original', error)
+
+        if isinstance(error, ignored):
+            return
 
         cog = ctx.cog
         if cog:
             if cog._get_overridden_method(cog.cog_command_error) is not None:
                 return
 
-        ignored = (commands.CommandNotFound, )
-        error = getattr(error, 'original', error)
-
-        if isinstance(error, ignored):
-            return
+        if isinstance(error, commands.CommandNotFound):
+            await ctx.send(f'**{ctx.message.content}** is not a valid command.')
 
         if isinstance(error, commands.DisabledCommand):
             await ctx.send(f'{ctx.command} has been disabled.')
-
-        elif isinstance(error, commands.NoPrivateMessage):
-            try:
-                await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
-            except discord.HTTPException:
-                pass
 
         elif isinstance(error, commands.BadArgument):
             if ctx.command.qualified_name == 'tag list':
