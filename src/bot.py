@@ -20,13 +20,21 @@ import sys
 
 # package-related imports
 import decorator_checks as checks
+import admin
 import utils
 
 bot = commands.Bot(command_prefix = '.') # create the bot
 bot.remove_command('help') # this will allow you to get the help menu.
 
+# Instatiate classes for admin and general usage
+admin_commands = admin.AdminCommands(bot)
+admin.setup(bot)
+
+# Role ID listing. The database uses
+
+
 @bot.event # when the bot first starts up, send a message and let dev know it's working.
-async def on_ready():
+async def on_ready():        
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
@@ -69,52 +77,6 @@ async def restart(ctx):
     os.system("clear")
     os.execv(sys.executable, ['python'] + sys.argv)
 
-@bot.command()
-@checks.has_role_id(727957642844176474)
-async def whois(ctx, *, memberID : str = None):
-    
-    if memberID == None:
-        await ctx.send("You must include a user ID")
-        return
-    
-    try:
-        # returns a member object based off of ID.
-        user = await ctx.guild.fetch_member(memberID)
-    except:
-        await ctx.send("User with that ID not found.")
-        return
-
-    # create an embed with the title of the user, thumbnail is avatar.
-    embed_title = "Information for User: " + user.display_name
-    embed = discord.Embed(title = embed_title)
-    embed.set_thumbnail(url = user.avatar_url)
-    
-    # Add the usernanme
-    embed.add_field(name = "Username", value = user.name + "#" + user.discriminator, 
-                    inline = True)
-    # Add the ID
-    embed.add_field(name = "User ID", value = user.id, inline = True)
-
-    # Roles in the server
-    roles = user.roles
-    roles.pop(0) # removes @everyone
-    roles = reversed(roles)
-    role_list = ["<@&{}>".format(role.id) for role in roles]
-    role_str = ", ".join(role_list)
-    embed.add_field(name = "Roles", value = role_str, inline = False)
-    
-    # When did the account join?
-    joined_at_f = utils.dt_obj_to_str(user.joined_at)
-    embed.add_field(name = "Joined Server", value = joined_at_f, inline = True)
-    
-    # When the account was created.
-    created_at_f = utils.dt_obj_to_str(user.created_at)
-    embed.add_field(name = "Account Created", value = created_at_f, inline = True)    
-    
-    # Send the message!
-    await ctx.send(embed = embed)
-
-
 # do an 8ball response
 @bot.command(aliases=["8ball"])
 async def _8ball(ctx, *, text : str = None):
@@ -132,4 +94,4 @@ async def _8ball(ctx, *, text : str = None):
     await ctx.send(choices[n])
 
 
-bot.run(os.getenv('YOUR_SECRET_KEY'))
+bot.run(os.getenv('TORNADO_TALK_SECRET_KEY'))
