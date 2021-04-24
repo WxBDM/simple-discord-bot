@@ -18,14 +18,17 @@ if len(sys.argv) != 2:
     print("Only include 1 name for cog stub.")
     exit()
      
+# capitalize the stub name, also remove "cog" at the end in the event they
+# accidentally put it there.
 stub_name = sys.argv[1].capitalize()
+if stub_name[-3:].lower() == 'cog':
+    stub_name = stub_name[:-3]
 
-if stub_name + ".py" in list(os.listdir(os.getcwd())):
-    print("ERROR: {}.py already in directory.".format(stub_name))
+if stub_name + "cog.py" in list(os.listdir(os.getcwd())):
+    print("ERROR: {}cog.py already in directory.".format(stub_name))
     exit()
     
 stub = f"""
-
 from discord.ext import commands
 
 class {stub_name}Commands(commands.Cog):
@@ -81,9 +84,9 @@ def setup(bot, *args, **kwargs):
 
 """
 
-file = open(f"{stub_name.lower()}.py", 'w')
+file = open(f"{stub_name.lower()}cog.py", 'w')
 file.write(stub)
-print("Cog stub successfully created: {0}. File: {0}.py".format(stub_name.lower()))
+print(f"Cog stub successfully created. File name: {stub_name.lower()}cog.py")
 file.close()
 
 

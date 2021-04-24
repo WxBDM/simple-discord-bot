@@ -15,14 +15,16 @@ def dt_obj_to_str(dt_obj):
     
     Format used: MM/DD/YYYY HH:MM'''
     
-    return dt_obj.strftime("%d/%m/%Y %H:%M")
+    return dt_obj.strftime("%m/%d/%Y %H:%M")
 
 def str_to_dt_obj(string):
     '''Utility function to convert a string in MM/DD/YYYY HH:MM to a datetime
     object.'''
     
-    return datetime.strptime(string, "%d/%m/%Y %H:%M")
+    return datetime.strptime(string, "%m/%d/%Y %H:%M")
 
+def get_utc_time():
+    return datetime.utcnow()
 
 class Embed:
     
@@ -39,7 +41,7 @@ class Embed:
     def set_thumbnail(self, url):
         self.embed.set_thumbnail(url = url)
 
-    def add_text(self, name = None, value = None, inline = False):
+    def add_text(self, name = '\u200b', value = '\u200b', inline = False):
         self.embed.add_field(name = name, value = value, inline = inline)
 
     def create_embed(self):

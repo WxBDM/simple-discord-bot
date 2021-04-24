@@ -9,48 +9,59 @@ Class for administrative commands.
 
 import discord
 import utils
-import os
-import sys
 from discord.ext import commands
 
 class AdminCommands(commands.Cog):
 
-    def __init__(self, bot, admin_id, *args, **kwargs):
+    def __init__(self, bot, *args, **kwargs):
         self.bot = bot
-        self.admin_id = admin_id
-        
-        # args and kwargs, in case they want them.
         self.args = args
         self.kwargs = kwargs
 
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        pass
-    
     async def cog_check(self, ctx):
         '''Checks to make sure you have the admin role.'''
         
+        admin_id = self.kwargs['admin_id']
+        
         role_list = [x.id for x in ctx.message.author.roles] # get list of roles
-        if self.admin_id in role_list:
+        if admin_id in role_list:
             return True # the user running the command has the admin role.
         
         # If the user doesn't have the role, let them know.
-        role_name = discord.utils.get(ctx.guild.roles, id = self.admin_id)
+        role_name = discord.utils.get(ctx.guild.roles, id = admin_id)
         if role_name == None:
             await ctx.send("You do not have the role needed to use this command.")
             await ctx.send(f"Note: Unable to find role name. ID: {self.admin_id}")
             return False
         
+        # if all goes right, it should print this message. Above is for when
+        #   something goes wrong and it can't find the role.
         await ctx.send(f"You must have the {role_name} role in order to run this command.")
         return False
-    
-    @commands.command(aliases=["r"]) #can either do .r or .restart
-    async def restart(self,ctx):  
-        '''Restarts the bot (used for dev purposes only)'''
+
+    @commands.Cog.listener()
+    async def on_message_delete(self, message):
         
-        await ctx.message.add_reaction("\U00002705")
-        os.system("clear")
-        os.execv(sys.executable, ['python'] + sys.argv)
+        # create an embed for a deleted message.
+        embed = utils.Embed(f"Deleted message")
+        
+        # Embeds are weird, just check the message to see char limit. this can be
+        #   changed.
+        if len(message.content) > 250:
+            val_msg = f"Channel: <#{message.channel.id}>\n"\
+            f"User: <@!{message.author.id}>\nMessage: {message.content[0:250]}...\n\n"\
+            f"Time (UTC): {utils.dt_obj_to_str(utils.get_utc_time())}"
+        else:
+            val_msg = f"Channel: <#{message.channel.id}>\n"\
+                f"User: <@!{message.author.id}>\nMessage: {message.content}\n\n"\
+                f"Time (UTC): {utils.dt_obj_to_str(utils.get_utc_time())}"
+        
+        embed.add_text(name = "Details", value = val_msg)
+        embed.set_thumbnail(message.author.avatar_url)
+        
+        # get the logging channel
+        channel = message.guild.get_channel(self.kwargs['logging_channel_id'])
+        await channel.send(embed = embed.to_ctx()) # send the message
         
     @commands.command()
     async def whois(self, ctx, memberID):
@@ -96,5 +107,5 @@ class AdminCommands(commands.Cog):
         # Send the message!
         await ctx.send(embed = embed)   
 
-def setup(bot, admin_id, *args, **kwargs):
-    bot.add_cog(AdminCommands(bot, admin_id, *args, **kwargs))
+def setup(bot, *args, **kwargs):
+    bot.add_cog(AdminCommands(bot, *args, **kwargs))

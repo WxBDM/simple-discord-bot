@@ -12,24 +12,27 @@ such as the bot owner ID, channels to write into, etc.
 
 """
 
-import discord
 from discord.ext import commands
 import os
 import random
 
 # package-related imports
-import admin
-import errors
-
-# configuration
-admin_id = 727957642844176474
+import admincog
+import errorscog
+import devcog
 
 bot = commands.Bot(command_prefix = '.') # create the bot
-bot.remove_command('help') # this will allow you to get the help menu.
+bot.remove_command('help') # this will allow you to create the help menu.
+
+# configuration
+bot.owner_id = 372813942180806658
+admin_id = 727957642844176474
+logging_channel_id = 835521843489931264
 
 # Register each component of the bot (aka, cogs)
-admin.setup(bot, admin_id) # Administrative stuff
-errors.setup(bot) # Error handling
+admincog.setup(bot, admin_id = admin_id, logging_channel_id = logging_channel_id)
+errorscog.setup(bot)
+devcog.setup(bot)
 
 @bot.event # when the bot first starts up, send a message and let dev know it's working.
 async def on_ready():        
@@ -70,5 +73,4 @@ async def _8ball(ctx, *, text : str = None):
     
     await ctx.send(choices[n])
 
-
-bot.run(os.getenv('TORNADO_TALK_SECRET_KEY'))
+bot.run(os.getenv('YOUR_SECRET_KEY'))
