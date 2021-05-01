@@ -33,8 +33,7 @@ class CommandErrorHandler(commands.Cog):
             return
         
         # ignored errors
-        ignored = (commands.NoPrivateMessage, discord.HTTPException,
-                   commands.CheckFailure)
+        ignored = (commands.NoPrivateMessage, discord.HTTPException)
         error = getattr(error, 'original', error)
 
         if isinstance(error, ignored):
@@ -46,7 +45,7 @@ class CommandErrorHandler(commands.Cog):
                 return
 
         if isinstance(error, commands.CommandNotFound):
-            await ctx.send(f'**{ctx.message.content}** is not a valid command.')
+            await ctx.send(f'That is not a valid command.')
 
         if isinstance(error, commands.DisabledCommand):
             await ctx.send(f'{ctx.command} has been disabled.')
@@ -54,7 +53,10 @@ class CommandErrorHandler(commands.Cog):
         elif isinstance(error, commands.BadArgument):
             if ctx.command.qualified_name == 'tag list':
                 await ctx.send('I could not find that member. Please try again.')
-
+        
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"The command {ctx.command} requires additional arguments!")
+        
         else:
             print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
             traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)

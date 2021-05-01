@@ -17,9 +17,7 @@ import os
 import random
 
 # package-related imports
-import admincog
-import errorscog
-import devcog
+from cogs import admincog, errorscog, devcog
 
 bot = commands.Bot(command_prefix = '.') # create the bot
 bot.remove_command('help') # this will allow you to create the help menu.
@@ -34,8 +32,12 @@ admincog.setup(bot, admin_id = admin_id, logging_channel_id = logging_channel_id
 errorscog.setup(bot)
 devcog.setup(bot)
 
-@bot.event # when the bot first starts up, send a message and let dev know it's working.
-async def on_ready():        
+# This method will run when the bot becomes ready to use.
+@bot.event
+async def on_ready():    
+
+    # We want to load the id's into the 
+        
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)

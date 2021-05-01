@@ -84,9 +84,9 @@ def setup(bot, *args, **kwargs):
 
 """
 
-file = open(f"{stub_name.lower()}cog.py", 'w')
+file = open(f"cogs/{stub_name.lower()}cog.py", 'w')
 file.write(stub)
-print(f"Cog stub successfully created. File name: {stub_name.lower()}cog.py")
+print(f"Cog stub successfully created: cogs/{stub_name.lower()}cog.py")
 file.close()
 
 

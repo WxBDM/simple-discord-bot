@@ -1,5 +1,6 @@
 sdiscbot/
 .DS_Store
+simple-database.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

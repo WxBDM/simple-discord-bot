@@ -29,7 +29,7 @@ class DevCommands(commands.Cog):
     async def ping(self, ctx):
         await ctx.send('Pong!')
     
-    @commands.command(aliases=["r"])
+    @commands.command(aliases=["r", "R"])
     async def restart(self, ctx):    
         await ctx.message.add_reaction('\U0001f44d')
         os.system("clear")
